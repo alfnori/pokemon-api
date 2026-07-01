@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { TeamApplicationService } from '../services/team-application.service';
 import { TeamResponseDto } from '../dto/team-response.dto';
 import { CreateTeamDto } from '../dto/create-team.dto';
@@ -10,6 +19,7 @@ import { PokemonApplicationService } from '../../pokemon/services/pokemon-applic
 export class TeamController {
   constructor(
     private readonly teamApplicationService: TeamApplicationService,
+    @Inject(forwardRef(() => PokemonApplicationService))
     private readonly pokemonApplicationService: PokemonApplicationService,
   ) {}
 
