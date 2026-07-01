@@ -31,7 +31,7 @@ export class Pokemon {
   @Column({ type: 'simple-json', nullable: true })
   types: string[] | null;
 
-  @Column({ name: 'last_synced_at', type: 'datetime', nullable: true })
+  @Column({ name: 'last_synced_at', type: 'timestamp', nullable: true })
   lastSyncedAt: Date | null;
 
   @CreateDateColumn()
