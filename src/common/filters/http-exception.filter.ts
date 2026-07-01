@@ -17,28 +17,37 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message: string | string[] = 'Internal server error';
+    const errorResponse: {
+      statusCode: number;
+      message: string | string[];
+      error?: string;
+    } = {
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error',
+    };
 
     if (exception instanceof HttpException) {
-      status = exception.getStatus();
+      errorResponse.statusCode = exception.getStatus();
       const exResponse = exception.getResponse();
 
       if (typeof exResponse === 'string') {
-        message = exResponse;
+        errorResponse.message = exResponse;
       } else if (typeof exResponse === 'object') {
         const body = exResponse as Record<string, unknown>;
-        message = (body.message as string | string[]) ?? message;
+        if (body.message) {
+          errorResponse.message = body.message as string | string[];
+        }
+        errorResponse.error = body.error as string | undefined;
       }
 
-      if (status >= 500) {
+      if (errorResponse.statusCode >= 500) {
         this.logger.error(
-          `[${request.method}] ${request.url} -> ${status}`,
+          `[${request.method}] ${request.url} -> ${errorResponse.statusCode}`,
           exception.stack,
         );
       } else {
         this.logger.warn(
-          `[${request.method}] ${request.url} -> ${status} - ${JSON.stringify(message)}`,
+          `[${request.method}] ${request.url} -> ${errorResponse.statusCode} - ${JSON.stringify(errorResponse.message)}`,
         );
       }
     } else {
@@ -49,9 +58,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       );
     }
 
-    response.status(status).json({
-      statusCode: status,
-      message,
+    response.status(errorResponse.statusCode).json({
+      ...errorResponse,
       timestamp: new Date().toISOString(),
       path: request.url,
     });
