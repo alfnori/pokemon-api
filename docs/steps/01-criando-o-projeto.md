@@ -13,6 +13,6 @@ Verificar se o projeto compila, se as dependências corretas estão instaladas e
 - `yarn start:dev` executa sem erros
 - Dependências obrigatórias presentes: `@nestjs/typeorm`, `typeorm`, `pg`, `@nestjs/config`, `class-validator`, `class-transformer`, `axios`, `@nestjs/axios`
 - DevDependencies: `@nestjs/testing`, `@types/jest`, `@types/supertest`, `jest`, `ts-jest`, `supertest`, `ts-node`, `tsconfig-paths`
-- `yarn test` executa e o teste Hello World passa
-- `yarn test:e2e` executa e o teste Hello World passa
+- `yarn test` executa e o teste Gotta Catch ‘Em All passa
+- `yarn test:e2e` executa e o teste Gotta Catch ‘Em All passa
 - `yarn build` compila sem erros
