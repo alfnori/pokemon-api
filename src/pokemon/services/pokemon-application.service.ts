@@ -111,13 +111,31 @@ export class PokemonApplicationService {
   }
 
   async getById(pokeApiId: number): Promise<PokemonResponseDto> {
-    const pokemon = await this.pokemonRepository.findByPokeApiId(pokeApiId);
+    const pokemon = await this.resolvePokemonOrFetch(pokeApiId);
+    return PokemonMapper.entityToResponse(pokemon);
+  }
+
+  private async resolvePokemonOrFetch(pokeApiId: number): Promise<Pokemon> {
+    let pokemon = await this.pokemonRepository.findByPokeApiId(pokeApiId);
 
     if (!pokemon) {
-      throw new PokemonNotFoundException(pokeApiId);
+      const apiData = await this.pokemonGateway.fetchPokemon(pokeApiId);
+      pokemon = this.pokemonRepository.create(apiData);
+      return this.pokemonRepository.save(pokemon);
     }
 
-    return PokemonMapper.entityToResponse(pokemon);
+    if (
+      this.pokemonDomainService.shouldRefresh(
+        pokemon.lastSyncedAt,
+        this.cacheTtl,
+      )
+    ) {
+      const apiData = await this.pokemonGateway.fetchPokemon(pokeApiId);
+      pokemon = this.pokemonRepository.merge(pokemon, apiData);
+      return this.pokemonRepository.updateSync(pokemon);
+    }
+
+    return pokemon;
   }
 
   async refresh(pokeApiId: number): Promise<PokemonResponseDto> {
