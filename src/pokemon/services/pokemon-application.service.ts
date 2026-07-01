@@ -71,16 +71,16 @@ export class PokemonApplicationService {
         throw new TeamFullException(teamId, this.maxTeamSize);
       }
 
+      const savedPokemon = await manager.save(Pokemon, pokemon);
+
       const existing = await manager.findOneBy(TeamPokemon, {
         teamId,
-        pokemonId: pokemon.id,
+        pokemonId: savedPokemon.id,
       });
 
       if (existing) {
-        throw new PokemonDuplicatedException(teamId, pokemon.id);
+        throw new PokemonDuplicatedException(teamId, savedPokemon.id);
       }
-
-      const savedPokemon = await manager.save(Pokemon, pokemon);
 
       const teamPokemon = manager.create(TeamPokemon, {
         teamId,
