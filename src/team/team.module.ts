@@ -17,6 +17,11 @@ import { TeamPokemon } from './entities/team-pokemon.entity';
     TeamRepository,
     TeamPokemonRepository,
   ],
-  exports: [TeamApplicationService, TeamRepository],
+  exports: [
+    TeamApplicationService,
+    TeamDomainService,
+    TeamRepository,
+    TeamPokemonRepository,
+  ],
 })
 export class TeamModule {}

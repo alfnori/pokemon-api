@@ -5,9 +5,10 @@ import { TrainerApplicationService } from './services/trainer-application.servic
 import { TrainerDomainService } from './services/trainer-domain.service';
 import { TrainerRepository } from './repositories/trainer.repository';
 import { Trainer } from './entities/trainer.entity';
+import { CepModule } from '../cep/cep.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Trainer])],
+  imports: [TypeOrmModule.forFeature([Trainer]), CepModule],
   controllers: [TrainerController],
   providers: [
     TrainerApplicationService,

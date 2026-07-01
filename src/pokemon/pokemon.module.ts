@@ -7,9 +7,10 @@ import { PokemonDomainService } from './services/pokemon-domain.service';
 import { PokemonRepository } from './repositories/pokemon.repository';
 import { PokemonGateway } from './services/pokemon.gateway';
 import { Pokemon } from './entities/pokemon.entity';
+import { TeamModule } from '../team/team.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pokemon]), HttpModule],
+  imports: [TypeOrmModule.forFeature([Pokemon]), HttpModule, TeamModule],
   controllers: [PokemonController],
   providers: [
     PokemonApplicationService,
