@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { PokemonController } from './controllers/pokemon.controller';
@@ -10,7 +10,11 @@ import { Pokemon } from './entities/pokemon.entity';
 import { TeamModule } from '../team/team.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pokemon]), HttpModule, TeamModule],
+  imports: [
+    TypeOrmModule.forFeature([Pokemon]),
+    HttpModule,
+    forwardRef(() => TeamModule),
+  ],
   controllers: [PokemonController],
   providers: [
     PokemonApplicationService,
