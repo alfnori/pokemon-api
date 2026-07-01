@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pokemon-postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-pokemon}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-pokemon}
+      POSTGRES_DB: ${DATABASE_NAME:-pokemon_api}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER:-pokemon}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pokemon-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@pokemon.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - '5050:80'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pokemon-api
+    ports:
+      - '${PORT:-3000}:3000'
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: '5432'
+      DATABASE_USER: ${DATABASE_USER:-pokemon}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-pokemon}
+      DATABASE_NAME: ${DATABASE_NAME:-pokemon_api}
+      POKE_API_BASE_URL: ${POKE_API_BASE_URL:-https://pokeapi.co/api/v2}
+      CEP_API_BASE_URL: ${CEP_API_BASE_URL:-https://viacep.com.br/ws}
+      POKEMON_CACHE_TTL: ${POKEMON_CACHE_TTL:-604800}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
