@@ -4,6 +4,7 @@ import { TrainerRepository } from '../repositories/trainer.repository';
 import { CepService } from '../../cep/services/cep.service';
 import { TrainerNotFoundException } from '../../common/exceptions/trainer-not-found.exception';
 import { TrainerResponseDto } from '../dto/trainer-response.dto';
+import { TrainerMapper } from '../mappers/trainer.mapper';
 
 @Injectable()
 export class TrainerApplicationService {
@@ -31,7 +32,7 @@ export class TrainerApplicationService {
     });
 
     const saved = await this.trainerRepository.save(trainer);
-    return saved;
+    return TrainerMapper.entityToResponse(saved);
   }
 
   async update(
@@ -55,7 +56,7 @@ export class TrainerApplicationService {
 
     Object.assign(trainer, data);
     const saved = await this.trainerRepository.save(trainer);
-    return saved;
+    return TrainerMapper.entityToResponse(saved);
   }
 
   async findById(id: string): Promise<TrainerResponseDto> {
@@ -65,11 +66,12 @@ export class TrainerApplicationService {
       throw new TrainerNotFoundException(id);
     }
 
-    return trainer;
+    return TrainerMapper.entityToResponse(trainer);
   }
 
   async findAll(): Promise<TrainerResponseDto[]> {
-    return this.trainerRepository.findAll();
+    const trainers = await this.trainerRepository.findAll();
+    return TrainerMapper.entitiesToResponse(trainers);
   }
 
   async remove(id: string): Promise<void> {

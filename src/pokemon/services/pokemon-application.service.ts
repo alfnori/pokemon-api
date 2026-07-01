@@ -16,6 +16,7 @@ import { Pokemon } from '../entities/pokemon.entity';
 import { TeamPokemon } from '../../team/entities/team-pokemon.entity';
 import { PokemonResponseDto } from '../dto/pokemon-response.dto';
 import { AddPokemonResponseDto } from '../../team/dto/add-pokemon-response.dto';
+import { PokemonMapper } from '../mappers/pokemon.mapper';
 
 @Injectable()
 export class PokemonApplicationService {
@@ -91,7 +92,7 @@ export class PokemonApplicationService {
 
       return {
         position: teamPokemon.position!,
-        pokemon: savedPokemon,
+        pokemon: PokemonMapper.entityToResponse(savedPokemon),
       };
     });
   }
@@ -116,7 +117,7 @@ export class PokemonApplicationService {
       throw new PokemonNotFoundException(pokeApiId);
     }
 
-    return pokemon;
+    return PokemonMapper.entityToResponse(pokemon);
   }
 
   async refresh(pokeApiId: number): Promise<PokemonResponseDto> {
@@ -129,6 +130,7 @@ export class PokemonApplicationService {
     const apiData = await this.pokemonGateway.fetchPokemon(pokeApiId);
     Object.assign(pokemon, apiData);
 
-    return this.pokemonRepository.updateSync(pokemon);
+    const updated = await this.pokemonRepository.updateSync(pokemon);
+    return PokemonMapper.entityToResponse(updated);
   }
 }

@@ -7,7 +7,10 @@ export class TeamResponseDto {
   @ApiProperty({ description: 'Team name', example: 'My Team' })
   name: string;
 
-  @ApiProperty({ description: 'Trainer ID (UUID)', example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiProperty({
+    description: 'Trainer ID (UUID)',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   trainerId: string;
 
   @ApiProperty({ description: 'Creation timestamp' })

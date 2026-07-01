@@ -4,6 +4,7 @@ import { TeamRepository } from '../repositories/team.repository';
 import { TeamPokemonRepository } from '../repositories/team-pokemon.repository';
 import { TeamResponseDto } from '../dto/team-response.dto';
 import { TeamNotFoundException } from '../../common/exceptions/team-not-found.exception';
+import { TeamMapper } from '../mappers/team.mapper';
 
 @Injectable()
 export class TeamApplicationService {
@@ -23,7 +24,7 @@ export class TeamApplicationService {
     });
 
     const saved = await this.teamRepository.save(team);
-    return saved;
+    return TeamMapper.entityToResponse(saved);
   }
 
   async findById(id: string): Promise<TeamResponseDto> {
@@ -33,11 +34,12 @@ export class TeamApplicationService {
       throw new TeamNotFoundException(id);
     }
 
-    return team;
+    return TeamMapper.entityToResponse(team);
   }
 
   async findAll(): Promise<TeamResponseDto[]> {
-    return this.teamRepository.find();
+    const teams = await this.teamRepository.find();
+    return TeamMapper.entitiesToResponse(teams);
   }
 
   async remove(id: string): Promise<void> {

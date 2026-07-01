@@ -5,8 +5,14 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ValueTransformer,
 } from 'typeorm';
 import { TeamPokemon } from '../../team/entities/team-pokemon.entity';
+
+const dateTransformer: ValueTransformer = {
+  to: (value: Date | null): string | null => value?.toISOString() ?? null,
+  from: (value: string | null): Date | null => (value ? new Date(value) : null),
+};
 
 @Entity('pokemons')
 export class Pokemon {
@@ -31,7 +37,12 @@ export class Pokemon {
   @Column({ type: 'simple-json', nullable: true })
   types: string[] | null;
 
-  @Column({ name: 'last_synced_at', type: 'timestamp', nullable: true })
+  @Column({
+    name: 'last_synced_at',
+    type: 'varchar',
+    nullable: true,
+    transformer: dateTransformer,
+  })
   lastSyncedAt: Date | null;
 
   @CreateDateColumn()

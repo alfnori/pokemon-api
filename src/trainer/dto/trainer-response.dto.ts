@@ -13,10 +13,18 @@ export class TrainerResponseDto {
   @ApiProperty({ description: 'Brazilian ZIP code', example: '01001-000' })
   cep: string;
 
-  @ApiProperty({ description: 'Street address', nullable: true, example: 'Rua Exemplo' })
+  @ApiProperty({
+    description: 'Street address',
+    nullable: true,
+    example: 'Rua Exemplo',
+  })
   street: string | null;
 
-  @ApiProperty({ description: 'Neighborhood', nullable: true, example: 'Centro' })
+  @ApiProperty({
+    description: 'Neighborhood',
+    nullable: true,
+    example: 'Centro',
+  })
   district: string | null;
 
   @ApiProperty({ description: 'City', nullable: true, example: 'São Paulo' })
