@@ -13,6 +13,9 @@ export const configuration = () => ({
   cepApi: {
     baseUrl: process.env.CEP_API_BASE_URL ?? 'https://viacep.com.br/ws',
   },
+  team: {
+    maxSize: parseInt(process.env.TEAM_MAX_SIZE ?? '5', 10),
+  },
   pokemon: {
     cacheTtl: parseInt(process.env.POKEMON_CACHE_TTL ?? '604800', 10),
   },

@@ -9,4 +9,8 @@ export class PokemonRepository {
     @InjectRepository(Pokemon)
     private readonly repo: Repository<Pokemon>,
   ) {}
+
+  async findByPokeApiId(pokeApiId: number): Promise<Pokemon | null> {
+    return this.repo.findOneBy({ pokeApiId });
+  }
 }

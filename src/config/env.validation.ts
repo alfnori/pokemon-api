@@ -10,4 +10,5 @@ export const validationSchema = Joi.object({
   POKE_API_BASE_URL: Joi.string().uri().default('https://pokeapi.co/api/v2'),
   CEP_API_BASE_URL: Joi.string().uri().default('https://viacep.com.br/ws'),
   POKEMON_CACHE_TTL: Joi.number().default(604800),
+  TEAM_MAX_SIZE: Joi.number().min(1).max(20).default(5),
 });
