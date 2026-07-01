@@ -5,22 +5,28 @@ import { Team } from '../entities/team.entity';
 import { TeamPokemon } from '../entities/team-pokemon.entity';
 
 @Injectable()
-export class TeamRepository {
+export class TeamRepository extends Repository<Team> {
   constructor(
     @InjectRepository(Team)
-    private readonly repo: Repository<Team>,
-  ) {}
+    repo: Repository<Team>,
+  ) {
+    super(repo.target, repo.manager, repo.queryRunner);
+  }
 
   async findById(id: string): Promise<Team | null> {
-    return this.repo.findOneBy({ id });
+    return this.findOneBy({ id });
+  }
+
+  async findByTrainer(trainerId: string): Promise<Team[]> {
+    return this.find({ where: { trainerId } });
   }
 
   async countPokemon(teamId: string): Promise<number> {
-    return this.repo.manager.count(TeamPokemon, { where: { teamId } });
+    return this.manager.count(TeamPokemon, { where: { teamId } });
   }
 
   async existsPokemon(teamId: string, pokemonId: string): Promise<boolean> {
-    const count = await this.repo.manager.count(TeamPokemon, {
+    const count = await this.manager.count(TeamPokemon, {
       where: { teamId, pokemonId },
     });
     return count > 0;
