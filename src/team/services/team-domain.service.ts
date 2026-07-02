@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { TeamRepository } from '../repositories/team.repository';
 import { TeamNotFoundException } from '../../common/exceptions/team-not-found.exception';
 import { TeamFullException } from '../../common/exceptions/team-full.exception';
@@ -7,20 +6,13 @@ import { PokemonDuplicatedException } from '../../common/exceptions/pokemon-dupl
 
 @Injectable()
 export class TeamDomainService {
-  private readonly maxTeamSize: number;
+  constructor(private readonly teamRepository: TeamRepository) {}
 
-  constructor(
-    private readonly teamRepository: TeamRepository,
-    configService: ConfigService,
-  ) {
-    this.maxTeamSize = configService.get<number>('team.maxSize', 5);
-  }
-
-  async validateTeamLimit(teamId: string): Promise<void> {
+  async validateTeamLimit(teamId: string, maxSize: number): Promise<void> {
     const count = await this.teamRepository.countPokemon(teamId);
 
-    if (count >= this.maxTeamSize) {
-      throw new TeamFullException(teamId);
+    if (count >= maxSize) {
+      throw new TeamFullException(teamId, maxSize);
     }
   }
 

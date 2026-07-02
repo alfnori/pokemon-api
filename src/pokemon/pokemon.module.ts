@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { PokemonController } from './controllers/pokemon.controller';
@@ -7,14 +7,9 @@ import { PokemonDomainService } from './services/pokemon-domain.service';
 import { PokemonRepository } from './repositories/pokemon.repository';
 import { PokemonGateway } from './services/pokemon.gateway';
 import { Pokemon } from './entities/pokemon.entity';
-import { TeamModule } from '../team/team.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Pokemon]),
-    HttpModule,
-    forwardRef(() => TeamModule),
-  ],
+  imports: [TypeOrmModule.forFeature([Pokemon]), HttpModule],
   controllers: [PokemonController],
   providers: [
     PokemonApplicationService,
@@ -22,6 +17,11 @@ import { TeamModule } from '../team/team.module';
     PokemonRepository,
     PokemonGateway,
   ],
-  exports: [PokemonApplicationService, PokemonRepository],
+  exports: [
+    PokemonApplicationService,
+    PokemonRepository,
+    PokemonDomainService,
+    PokemonGateway,
+  ],
 })
 export class PokemonModule {}

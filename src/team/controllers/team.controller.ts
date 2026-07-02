@@ -1,26 +1,14 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Body,
-  Param,
-  Inject,
-  forwardRef,
-} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param } from '@nestjs/common';
 import { TeamApplicationService } from '../services/team-application.service';
 import { TeamResponseDto } from '../dto/team-response.dto';
 import { CreateTeamDto } from '../dto/create-team.dto';
 import { AddPokemonToTeamDto } from '../dto/add-pokemon-to-team.dto';
 import { AddPokemonResponseDto } from '../dto/add-pokemon-response.dto';
-import { PokemonApplicationService } from '../../pokemon/services/pokemon-application.service';
 
 @Controller('teams')
 export class TeamController {
   constructor(
     private readonly teamApplicationService: TeamApplicationService,
-    @Inject(forwardRef(() => PokemonApplicationService))
-    private readonly pokemonApplicationService: PokemonApplicationService,
   ) {}
 
   @Post()
@@ -48,7 +36,7 @@ export class TeamController {
     @Param('id') teamId: string,
     @Body() dto: AddPokemonToTeamDto,
   ): Promise<AddPokemonResponseDto> {
-    return this.pokemonApplicationService.addToTeam(teamId, dto.pokemonId);
+    return this.teamApplicationService.addPokemon(teamId, dto.pokemonId);
   }
 
   @Delete(':id/pokemons/:pokemonId')
@@ -56,6 +44,6 @@ export class TeamController {
     @Param('id') teamId: string,
     @Param('pokemonId') pokemonId: string,
   ): Promise<void> {
-    return this.pokemonApplicationService.removeFromTeam(teamId, pokemonId);
+    return this.teamApplicationService.removePokemon(teamId, pokemonId);
   }
 }

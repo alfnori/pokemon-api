@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TrainerDomainService } from './trainer-domain.service';
 import { TrainerRepository } from '../repositories/trainer.repository';
-import { CepService } from '../../cep/services/cep.service';
+import { CepGateway } from '../../cep/gateways/cep.gateway';
 import { TrainerNotFoundException } from '../../common/exceptions/trainer-not-found.exception';
 import { TrainerResponseDto } from '../dto/trainer-response.dto';
 import { TrainerMapper } from '../mappers/trainer.mapper';
@@ -11,7 +11,7 @@ export class TrainerApplicationService {
   constructor(
     private readonly trainerDomainService: TrainerDomainService,
     private readonly trainerRepository: TrainerRepository,
-    private readonly cepService: CepService,
+    private readonly cepGateway: CepGateway,
   ) {}
 
   async create(data: {
@@ -19,7 +19,7 @@ export class TrainerApplicationService {
     email: string;
     cep: string;
   }): Promise<TrainerResponseDto> {
-    const address = await this.cepService.searchByCep(data.cep);
+    const address = await this.cepGateway.searchByCep(data.cep);
 
     const trainer = this.trainerRepository.create({
       name: data.name,
@@ -50,7 +50,7 @@ export class TrainerApplicationService {
     }
 
     if (data.cep && data.cep !== trainer.cep) {
-      const address = await this.cepService.searchByCep(data.cep);
+      const address = await this.cepGateway.searchByCep(data.cep);
       Object.assign(trainer, address);
     }
 
