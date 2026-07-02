@@ -1,63 +1,31 @@
-# AGENTS.md — pokemon-api
-
-## Project Purpose
-
-NestJS REST API for a Leany Senior Backend Developer technical challenge. Manages Pokémon trainers, teams, and Pokémon with PokéAPI + ViaCEP integration.
-
-## Architecture (see `docs/`)
-
-Clean Architecture + DDD-light monolith:
-
-```
-Controller → Application Service → Domain Service → Repository → TypeORM → PostgreSQL
-                                       ↓
-                               External Gateway (PokéAPI / ViaCEP)
-```
-
-Modules: `trainer`, `team`, `pokemon`, `cep` — each with `controller/`, `service/`, `repository/`, `dto/`, `entity/`.
-
-## Key Constraints
-
-- **TypeORM only** — no other ORMs
-- **Migrations only** — `synchronize: false`, never `synchronize: true`
-- **PostgreSQL via Docker** — docker-compose with `api`, `postgres`, `pgadmin`
-- **Soft delete** on Trainer/Team (use `@DeleteDateColumn`)
-- **No `process.env` in classes** — use `@nestjs/config` `ConfigService`
-- **No entities in HTTP responses** — use DTOs + mappers
-- **No repositories in controllers** — inject only Application Services
-- **No direct HTTP calls in services** — encapsulate in Gateway classes
+# Pokémon API — AGENTS.md
 
 ## Commands
+- `yarn build` — compile (deleteOutDir: true, clears dist/)
+- `yarn lint` — eslint + prettier (pre-existing lint issues in `http-exception.filter.ts` and `main.ts`: not your problem)
+- `yarn test` — unit tests (jest, `src/**/*.spec.ts`)
+- `yarn test:e2e` — e2e tests (`test/*.e2e-spec.ts`)
+- `yarn migration:generate src/database/migrations/<name>` — generate a migration (requires `yarn build` first)
+- `yarn migration:run` / `yarn migration:revert` — run/revert via `dist/database/typeorm.config.js`
 
-| Command | Purpose |
-|---|---|
-| `yarn` | Install dependencies |
-| `yarn start:dev` | Watch mode dev server |
-| `yarn build` | Compile to `dist/` |
-| `yarn lint` | ESLint + fix |
-| `yarn format` | Prettier `src/` and `test/` |
-| `yarn test` | Unit tests (Jest, `*.spec.ts` in `src/`) |
-| `yarn test:e2e` | E2E tests (`test/*.e2e-spec.ts`) |
-| `yarn test:cov` | Test coverage |
+## Architecture
+- **NestJS** with TypeORM, PostgreSQL, Swagger, class-validator/class-transformer
+- Global prefix: `api/v1`. Route `@Get(':id')` → `GET /api/v1/teams/:id`
+- Each module: controller → `*ApplicationService` (orchestration) → `*DomainService` (validation) → repository (extends TypeORM `Repository<Entity>`)
+- Mappers are static utility classes (no DI), e.g. `TeamMapper.entityToResponse(team)`
+- Custom exceptions per domain extend NestJS HTTP exceptions (e.g. `TeamNotFoundException extends NotFoundException`)
+- Global `HttpExceptionFilter` and `ValidationPipe` (whitelist + transform + forbidNonWhitelisted)
 
-## Tooling
+## Conventions
+- **Entities**: `teamPokemons` (camelCase) via `@OneToMany`, but `team_pokemons` in DB via `@Entity('team_pokemons')`
+- **Relation loading**: use TypeORM `relations` option object style, e.g. `{ teamPokemons: { pokemon: true } }` — **one query with LEFT JOIN, no N+1**
+- **Repository `findById`** is bare (no relations). Controller `GET /teams/:id` calls `repository.findByIdWithTeam` (loads `{ teamPokemons: { pokemon: true } }`) — **one query with LEFT JOIN, no N+1**
+- **Controllers** use `@Get(':id')` → method named `findByIdWithTeam`, calling `applicationService.findByIdWithTeam(id)`
+- **Module exports**: always export repositories and services so other modules can use them
+- **Testing**: e2e tests override `DatabaseModule` with `MockDatabaseModule` (sql.js, in-memory, synchronize: true)
+- **Docker compose** has postgres, pgadmin, and the API. Env defaults in `.env`
+- **Swagger docs** at `/api/docs`, decorated inline with `@ApiProperty`
+- **Config** loaded via `ConfigModule` with Joi schema validation
 
-- **NestJS 11** with `nodenext` module resolution
-- **TypeScript 5.7**, target ES2023
-- **Prettier**: single quotes, trailing commas
-- **ESLint**: `typescript-eslint` recommended + prettier plugin, `no-explicit-any` off
-- **Jest**: ts-jest transform, tests match `*.spec.ts`
-- **E2E**: supertest, separate `jest-e2e.json` config, rootDir `.`, regex `.e2e-spec.ts$`
-
-## Docs
-
-- `docs/task.md` — full challenge requirements
-- `docs/steps.md` — implementation order (18 phases)
-- `docs/evaluation.md` — architecture decisions, data model, endpoints, business rules
-
-## Gotchas
-
-- `module: "nodenext"` means imports need explicit `.js` extensions when compiling — NestJS CLI handles this for `nest build` but be careful in test/standalone scripts
-- TypeORM 1.x uses the new `DataSource` pattern, not `Connection`
-- ValidationPipe is **not** global by default — configure in `main.ts`
-- The project is currently at scaffolding stage (NestJS starter) — all domain code still needs implementation
+## Key packages
+- TypeORM v1 (experimental), NestJS v11, pg, sql.js (test), axios, @nestjs/axios, @nestjs/swagger

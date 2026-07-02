@@ -125,7 +125,7 @@ export class TeamApplicationService {
       throw new TeamNotFoundException(id);
     }
 
-    return TeamMapper.entityToResponse(team, true);
+    return TeamMapper.entityToResponse(team);
   }
 
   async findByIdWithTeam(id: string): Promise<TeamResponseDto> {
