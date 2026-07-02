@@ -14,7 +14,10 @@ export class TeamRepository extends Repository<Team> {
   }
 
   async findById(id: string): Promise<Team | null> {
-    return this.findOneBy({ id });
+    return this.findOne({
+      where: { id },
+      relations: { teamPokemons: { pokemon: true } },
+    });
   }
 
   async findByTrainer(trainerId: string): Promise<Team[]> {

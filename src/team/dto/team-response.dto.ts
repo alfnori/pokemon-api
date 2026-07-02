@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TeamPokemonEntryDto } from './team-pokemon-entry.dto';
 
 export class TeamResponseDto {
   @ApiProperty({ description: 'Unique identifier' })
@@ -18,4 +19,10 @@ export class TeamResponseDto {
 
   @ApiProperty({ description: 'Last update timestamp' })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Pokémons in the team',
+    type: [TeamPokemonEntryDto],
+  })
+  pokemons: TeamPokemonEntryDto[];
 }
