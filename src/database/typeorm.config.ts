@@ -1,8 +1,5 @@
 import { DataSource } from 'typeorm';
-import { config } from 'dotenv';
 import { resolve } from 'node:path';
-
-config();
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
