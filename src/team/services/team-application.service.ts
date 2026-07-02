@@ -128,6 +128,16 @@ export class TeamApplicationService {
     return TeamMapper.entityToResponse(team, true);
   }
 
+  async findByIdWithTeam(id: string): Promise<TeamResponseDto> {
+    const team = await this.teamRepository.findByIdWithTeam(id);
+
+    if (!team) {
+      throw new TeamNotFoundException(id);
+    }
+
+    return TeamMapper.entityToResponse(team, true);
+  }
+
   async findAll(): Promise<TeamResponseDto[]> {
     const teams = await this.teamRepository.find();
     return TeamMapper.entitiesToResponse(teams);

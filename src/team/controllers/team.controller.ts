@@ -22,8 +22,8 @@ export class TeamController {
   }
 
   @Get(':id')
-  async findById(@Param('id') id: string): Promise<TeamResponseDto> {
-    return this.teamApplicationService.findById(id);
+  async findByIdWithTeam(@Param('id') id: string): Promise<TeamResponseDto> {
+    return this.teamApplicationService.findByIdWithTeam(id);
   }
 
   @Delete(':id')
