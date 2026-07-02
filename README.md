@@ -28,7 +28,7 @@ REST API for Pokémon trainer management built with NestJS, TypeORM, and Postgre
 ### 1. Clone and install
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/alfnori/pokemon-api
 cd pokemon-api
 yarn install
 ```
@@ -364,6 +364,68 @@ This API does not implement authentication or authorization — it was left out 
 2. **Admin/OAuth access** — A separate OAuth 2.0 flow (e.g., client credentials grant) would allow internal applications (dashboards, back-office tools) to read data across all trainers. This broader scope enables functionality like global Pokémon roster management without granting full user impersonation.
 
 This separation follows the principle of least privilege: regular trainers mutate only their own data, while administrative access is reserved for authorized services.
+
+---
+
+## STEP-Driven Development with AI Assistance
+
+This project was built using a **STEP-driven** workflow designed for AI-assisted coding. Instead of prompting the AI with vague feature requests, the work is broken into documented, reviewable steps — each with clear objectives, constraints, and acceptance criteria.
+
+### Core Documents
+
+| File | Purpose |
+|------|---------|
+| `docs/task.md` | High-level problem statement and requirements |
+| `docs/evaluation.md` | Architecture proposal, data model, and design decisions |
+| `docs/steps.md` | Ordered list of implementation steps with architectural reasoning |
+| `docs/steps/<STEP>.md` | Detailed spec for a single step (when granularity is needed) |
+
+### The Workflow
+
+Each cycle follows three phases:
+
+**1. Review** — Before writing code, an independent review validates the previous step against its acceptance criteria. This catches regressions and architectural drift early, before new code is built on top of it.
+
+**2. Plan** — The AI loads all relevant docs, inspects the current codebase, performs a gap analysis, and produces a concrete implementation plan. No code is written until the plan is confirmed.
+
+**3. Implement** — The AI executes the plan, then validates compilation, dependency injection, module registration, and acceptance criteria.
+
+### Separation of Concerns
+
+The **Implement** and **Review** roles are intentionally separated into two OpenCode skills:
+
+- `implement-step` — reads docs, analyzes gaps, plans, writes code, validates. It is focused on producing working, correctly-scoped implementations without anticipating future steps.
+- `review-step` — reads docs, inspects the source, validates architecture and acceptance criteria, and produces a review report. It never modifies code.
+
+This prevents the same agent from approving its own work and ensures each step is evaluated against the documented spec — not against an internal, unverified understanding.
+
+### Human Review Before Commit
+
+Every line of AI-generated code is manually reviewed and adjusted before being committed. The AI produces a first pass, but a human verifies correctness, consistency, and alignment with the intended architecture. This means:
+
+- No code enters the repository without explicit human approval.
+- The AI's output is treated as a **draft** — a productivity boost, not an unchecked source of truth.
+- Architectural decisions in `docs/evaluation.md` and `docs/steps.md` are written by humans and read by the AI, not the other way around. The AI implements within those boundaries.
+
+### Regression Safety
+
+Because each step is small, well-documented, and independently reviewable, adding automated tests for regression detection is straightforward. Every step can include or be followed by test cases that cover its acceptance criteria. Running the full suite after each step confirms that new code does not break existing behavior:
+
+```bash
+yarn build && yarn test && yarn test:e2e
+```
+
+This creates a tight feedback loop: document → implement → review → test → commit. The documented step definition is the single source of truth, and the test suite is the safety net that proves it was implemented correctly.
+
+### Prompts
+
+```bash
+# Implement a step
+opencode "implement step 4 of the project"
+
+# Review a completed step
+opencode "review step 4"
+```
 
 ---
 
